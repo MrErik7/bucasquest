@@ -35,12 +35,12 @@ class Overlay
         # Set the moving inv variables
         @item_in_movement = false # false as default 
         @item_in_movement_id = "" # the item ID  
-        @item_in_movement_lastframepos = 32 # the last known frame position (32 out of bonds perfect)
+        @item_in_movement_lastframepos = 36 # the last known frame position (36 out of bonds perfect)
         @item_in_movement_image = 0 # No image as default
 
         # Hotbar variables
-        @hotbar_x = (window_width/2)-@inventory.width/2
-        @hotbar_y = @inventory_y+@inventory.height-@inventory_item_holder.height-2
+        @hotbar_x = @inventory_x+@inventory.width/1.7
+        @hotbar_y = @inventory_y
 
         # All the items in the inventory
         # Economy ---
@@ -206,40 +206,37 @@ class Overlay
         return false
     end
 
-    # Draw the hotbar
-    def display_hotbar_items(player_hotbar)
-
-        # Loop through all the hotbar items
-        counter = 0
-        for x in player_hotbar
-
+    def display_hotbar_items(player_inventory)
+        # loop through all the items in the hotbar array and the display them
+        for i in 0..player_inventory.load_hotbar_array.length-1
             # Draw the inventory frame
-            pos_x = @hotbar_x+counter*@itemholder_spacing+@itemholder_spacing
-            pos_y = @hotbar_y
+            pos_x = @hotbar_x
+            pos_y = @hotbar_y+i*@itemholder_spacing+@itemholder_spacing
             @inventory_item_holder.draw(pos_x, pos_y)
+                            
+            # Get item (number) in the hash (0-35) (36 inv slots)
+            item_hash_pos = 32+i
 
-            # Draw the item
-            if (x != 0)
-                # Get the item image
-                item = x
-                item_image = getItemImage(item)
+            # Get the item position
+            item_x, item_y = player_inventory.get_position(item_hash_pos)
 
-                # Draw the item
-                if (item != 0)
-                    item_image.draw(item_x, item_y)
-                end
+            # If the item doesnt have a position --> generate one
+            if (item_x == 0 && item_y == 0)
+                item_x, item_y = pos_x+@gold_purse1.width, pos_y+@gold_purse1.height
+                player_inventory.update_position(item_hash_pos, item_x, item_y) # Then update the position in the stored hash
 
             end
-            
 
+            # Get the item image
+            item = player_inventory.load_hotbar_array[i]
+            item_image = getItemImage(item)
 
-
-            counter+=1
-
+            # Draw the item
+            if (item != 0 && item_hash_pos != @item_in_movement_lastframepos)
+                item_image.draw(item_x, item_y)
+            end
 
         end
-
-
 
     end
 
@@ -252,7 +249,7 @@ class Overlay
             @inventory.draw(@inventory_x, @inventory_y)
             @title_font.draw("Inventory", @inventory_x+(@inventory.width/2)-@title_font_size*1.5, @inventory_y, 10, 1, 1, Gosu::Color::BLACK)
             display_inventory_items(player_inventory)
-            display_hotbar_items(player_inventory.getHotbarArray())
+            display_hotbar_items(player_inventory)
 
             if (@item_in_movement)
                 @item_in_movement_image.draw(mouse_x, mouse_y)

@@ -25,18 +25,24 @@ class Inventory
 
         # Create the position hash (to hold all the items x and y visually)
         @hash_positions = {} 
-        (0..$introw*$intcol-1).each { |i| @hash_positions[i] = "0, 0"}
+        (0..($introw*$intcol)+$intcol-1).each { |i| @hash_positions[i] = "0, 0"}
 
         # Create the equipment slots
         @item1_equipped = 0
         @item2_equipped = 0
 
         # Create the hotbar
-        @array_hotbar = Array.new(5) # It should have 5 slots
+        @array_hotbar = [] # It should have 4 slots
+        
+        # Fill the array (with zeros since its empty)
+        for x in 0..3
+            @array_hotbar.push(0)
+
+        end
 
         # Hotbar position hash
-        @hash_positions = {} 
-        (0..5).each { |i| @hash_positions[i] = "0, 0"}
+        @hobar_hash_positions = {} 
+        (0..5).each { |i| @hobar_hash_positions[i] = "0, 0"}
 
     end
 
@@ -80,7 +86,8 @@ class Inventory
         @array_inventory_2d[row][col] = 0
     end
 
-    def getHotbarArray()
+    # All hotbar related
+    def load_hotbar_array()
         return @array_hotbar
     end
 
