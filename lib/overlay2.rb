@@ -68,13 +68,19 @@ class Overlay
                     
                     # Get and set the item into the new frame --> the new location for the item that has been moved
                     frame_row, frame_col = check_which_item_frame(player_inventory, mouse_x, mouse_y)
-                    player_inventory.set_item_in_2darray(frame_row, frame_col, @item_in_movement_id)
+
+                    if (frame_col == 8) # Hotbar
+                        player_inventory.set_item_in_hotbar_array(frame_row, @item_in_movement_id)
+
+                    else
+                        player_inventory.set_item_in_2darray(frame_row, frame_col, @item_in_movement_id)
+                    end
 
                     # Stop the movement of the item
                     @item_in_movement = false
                     @item_in_movement_id = ""
                     @item_in_movement_image = 0
-                    @item_in_movement_lastframepos = 32
+                    @item_in_movement_lastframepos = 36
                 end
             end
         end
@@ -132,6 +138,7 @@ class Overlay
 
     # The purpose of this function is to check which frame to put the item down after movement
     def check_which_item_frame(player_inventory, x, y)
+        # First check if its being dropped on the inv sec.
         for row in 0..player_inventory.load_2darray.length-1
             for col in 0..player_inventory.load_2darray[row].length-1
                 # Get the inventory frame position
@@ -150,7 +157,28 @@ class Overlay
                     end
                 end
             end
-        end        
+        end  
+        
+        # Then check the hotbar
+        for i in 0..player_inventory.load_hotbar_array.length
+            # Get the start and end pos of the inv holder
+            start_pos_x = @hotbar_x
+            start_pos_y = @hotbar_y+i*@itemholder_spacing+@itemholder_spacing
+
+            end_pos_x = start_pos_x+@inventory_item_holder.width
+            end_pos_y = start_pos_y+@inventory_item_holder.height
+
+            # Check if the given x and y are in any of these
+            if (x > start_pos_x && x < end_pos_x)
+
+                if (y > start_pos_y && y < end_pos_y)
+                    # Return row and col
+                    return i, 8 # Column 8 is for the hotbar, i will check this in the ui col method
+                end
+            end
+
+
+        end
 
         # If the fucntion does not return anything --> return the best available empty frame
         for row in 0..player_inventory.load_2darray.length-1
@@ -160,6 +188,8 @@ class Overlay
                 end
             end
         end
+
+        
 
     end
 
@@ -199,6 +229,36 @@ class Overlay
                             end
                         end
 
+                    end
+                end
+
+                # Then check the hotbar
+                for i in 0..player_inventory.load_hotbar_array.length-1
+                    item = player_inventory.load_hotbar_array[i]
+
+                    if (item != 0)
+                        item_image = getItemImage(item)
+                        start_x = @hotbar_x
+                        start_y = @hotbar_y+i*@itemholder_spacing+@itemholder_spacing
+            
+                        end_x = start_x+@inventory_item_holder.width
+                        end_y = start_y+@inventory_item_holder.height
+            
+                        if (mouse_x > start_x && mouse_x < end_x)
+                            if (mouse_y > start_y && mouse_y < end_y)   
+
+                                # Set the new variables
+                                @item_in_movement_id = item
+                                @item_in_movement_image = item_image
+                                @item_in_movement_lastframepos = row*player_inventory.load_2darray[row].length+col
+
+                                # Clear the old spot
+                                player_inventory.remove_item_in_hotbar_array(i)
+
+                                # Return true - item is now moving
+                                return true
+                            end
+                        end
                     end
                 end
             end

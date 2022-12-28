@@ -91,4 +91,15 @@ class Inventory
         return @array_hotbar
     end
 
+    def get_item_from_hotbar_array(pos)
+        return @array_hotbar[pos]
+    end
+
+    def set_item_in_hotbar_array(pos, itemid)
+        @array_hotbar[pos] = itemid
+    end
+
+    def remove_item_in_hotbar_array(pos)
+        @array_hotbar[pos] = 0
+    end
 end
