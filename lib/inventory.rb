@@ -36,15 +36,19 @@ class Inventory
         
         # Fill the array (with zeros since its empty)
         for x in 0..3
-            @array_hotbar.push(0)
+            @array_hotbar.push("gold_purse")
 
         end
-
         # Items equipped
         @item1_equipped = 0
         @item1_equipped_index = 0 # To keep track of which place in the array the item is equipped has
         @item1_equipped_x = 0
         @item1_equipped_y = 0
+
+        # All the items in the inventory
+        # Economy ---
+        @gold_purse1 = Gosu::Image.new("./src/ui/items/gold_purse1.png")
+        # ---      
 
     end
 
@@ -127,4 +131,12 @@ class Inventory
         return @item1_equipped_x, @item1_equipped_y
     end
 
+    def getItemImage(item)
+        case item
+            when "gold_purse"
+                return @gold_purse1
+            when 0
+                return 0
+        end
+    end
 end

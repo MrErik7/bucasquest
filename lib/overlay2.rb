@@ -42,10 +42,7 @@ class Overlay
         @hotbar_x = @inventory_x+@inventory.width/1.7
         @hotbar_y = @inventory_y
 
-        # All the items in the inventory
-        # Economy ---
-        @gold_purse1 = Gosu::Image.new("./src/ui/items/gold_purse1.png")
-        # ---      
+
 
     end
 
@@ -90,14 +87,7 @@ class Overlay
         return @inventory_showing
     end
 
-    def getItemImage(item)
-        case item
-            when "gold_purse"
-                return @gold_purse1
-            when 0
-                return 0
-        end
-    end
+ 
 
     # This method staticlly diplays all the items on the inv. grid
     def display_inventory_items(player_inventory)
@@ -117,14 +107,14 @@ class Overlay
 
                 # If the item doesnt have a position --> generate one
                 if (item_x == 0 && item_y == 0)
-                    item_x, item_y = pos_x+@gold_purse1.width, pos_y+@gold_purse1.height
+                    item_x, item_y = pos_x+14, pos_y+14
                     player_inventory.update_position(item_hash_pos, item_x, item_y) # Then update the position in the stored hash
 
                 end
 
                 # Get the item image
                 item = player_inventory.load_2darray[row][col]
-                item_image = getItemImage(item)
+                item_image = player_inventory.getItemImage(item)
 
                 # Draw the item
                 if (item != 0 && item_hash_pos != @item_in_movement_lastframepos)
@@ -205,7 +195,7 @@ class Overlay
                         item = player_inventory.load_2darray[row][col]
 
                         if (item != 0)
-                            item_image = getItemImage(item)
+                            item_image = player_inventory.getItemImage(item)
                             start_x = @inventory_x+col*@itemholder_spacing+@itemholder_spacing
                             start_y = @inventory_y+row*@itemholder_spacing+@itemholder_spacing
                                 
@@ -235,7 +225,7 @@ class Overlay
                     item = player_inventory.load_hotbar_array[i]
 
                     if (item != 0)
-                        item_image = getItemImage(item)
+                        item_image = player_inventory.getItemImage(item)
                         start_x = @hotbar_x
                         start_y = @hotbar_y+i*@itemholder_spacing+@itemholder_spacing
             
@@ -284,14 +274,14 @@ class Overlay
 
             # If the item doesnt have a position --> generate one
             if (item_x == 0 && item_y == 0)
-                item_x, item_y = pos_x+@gold_purse1.width, pos_y+@gold_purse1.height
+                item_x, item_y = pos_x+14, pos_y+14
                 player_inventory.update_position(item_hash_pos, item_x, item_y) # Then update the position in the stored hash
 
             end
 
             # Get the item image
             item = player_inventory.load_hotbar_array[i]
-            item_image = getItemImage(item)
+            item_image = player_inventory.getItemImage(item)
 
             # Draw the item
             if (item != 0 && item_hash_pos != @item_in_movement_lastframepos)
@@ -306,13 +296,32 @@ class Overlay
     def display_equipped_item(player)
         # Set the new x and y
         player_x, player_y = player.pos()
+
+        # Check if the player strikes
+        # IMPORTANT TO NOTE: IF YOU WERE TO UPGRADE THE ANIMATION IN THE FUTURE YOU NEED TO ADD MORE IF STATEMENTS HERE
+        player_striking, strike_frame = player.check_if_player_strikes()
+        if (player_striking)
+            if (strike_frame == 0) # Normal position for hand
+                y = player_y+player.get_height/2
+
+            elsif (strike_frame == 1) # The overhead strike
+                y = player_y+player.get_height
+    
+            elsif (strike_frame == 2) # The middle strike
+                y = player_y+player.get_height/4
+
+            end
+            puts(strike_frame.to_s)
+        else
+            # Set the y for the item if the player is not striking
+            y = player_y+player.get_height/2
+        end
         x = player_x+player.get_width/2
-        y = player_y+player.get_height/2
         player.get_inventory.set_coordinates_item_equipped(x, y)
   
         # Get the item image
         item = player.get_inventory.get_item_equipped
-        item_image = getItemImage(item)
+        item_image = player.get_invegetItemImage(item)
 
         # Draw it at its location
         if (item != 0)
@@ -322,18 +331,9 @@ class Overlay
 
     end
 
-
-
-
     def draw(player, mouse_x, mouse_y) # Draw the ui (later implement that th is function takes an argument so it knows which UI to draw but for now its fine)
         @bg.draw(@bg_x, @bg_y)
         @inv_icon.draw(@inv_icon_x, @inv_icon_y)
-
-
-        # First check if it exists an item to be equipped and that the player isnt walking up
-        if (player.get_inventory.get_item_equipped != 0 && !player.check_if_player_walks_up())
-            display_equipped_item(player)
-        end
 
         # Check wether the inventory things should be displayed or not
         if (@inventory_showing)

@@ -13,7 +13,7 @@ class BucasQuest < Gosu::Window
       super($window_width, $window_height, false) # Define the window width and height 
       self.caption = "BucasQuest 2.0"
       #self.fullscreen = true
-      #initalize_music("main or something")
+      #initialize_muisc("main or something")
       # ------
       
       # Map related
@@ -144,6 +144,11 @@ class BucasQuest < Gosu::Window
       if (id == Gosu::MsRight)
         @player.get_inventory.addToInventory("gold_purse")
         puts("right mouse button down")
+      end
+
+      # Just for debug for now --> strike
+      if (id == Gosu::KbE)
+        @player.strike()
       end
 
       # Check if the player should equip an item
