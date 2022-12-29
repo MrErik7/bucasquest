@@ -40,9 +40,11 @@ class Inventory
 
         end
 
-        # Hotbar position hash
-        @hobar_hash_positions = {} 
-        (0..5).each { |i| @hobar_hash_positions[i] = "0, 0"}
+        # Items equipped
+        @item1_equipped = 0
+        @item1_equipped_index = 0 # To keep track of which place in the array the item is equipped has
+        @item1_equipped_x = 0
+        @item1_equipped_y = 0
 
     end
 
@@ -102,4 +104,27 @@ class Inventory
     def remove_item_in_hotbar_array(pos)
         @array_hotbar[pos] = 0
     end
+
+    def set_item_equipped(num)
+        @item1_equipped_index = num
+        @item1_equipped = @array_hotbar[num]
+    end
+    
+    def get_item_equipped()
+        return @item1_equipped
+    end
+
+    def get_item_equipped_index()
+        return @item1_equipped_index
+    end
+
+    def set_coordinates_item_equipped(x, y)
+        @item1_equipped_x = x
+        @item1_equipped_y = y
+    end
+
+    def get_coordinates_item_equipped()
+        return @item1_equipped_x, @item1_equipped_y
+    end
+
 end

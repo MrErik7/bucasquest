@@ -45,6 +45,10 @@ class BucasQuest < Gosu::Window
       @player = Player.new 
       @player.warp(0, 0)
 
+      # Set the players equipped item to hotbar item 1
+      @player.get_inventory.set_item_equipped(0)
+
+
     end
   
     def update
@@ -105,28 +109,30 @@ class BucasQuest < Gosu::Window
     def draw
       @map.draw(@map_x, @map_y)
       @player.draw
-      @ingame_ui.draw(@player.get_inventory(), self.mouse_x, self.mouse_y)
+      @ingame_ui.draw(@player, self.mouse_x, self.mouse_y)
 
     end
+
 
     def button_up(id)
        # Check for keys released - to stop the walking animation
        if id == Gosu::KB_W
-        @player.set_animation_frame("up")
+        @player.reset_animation("up")
       end
 
       if id == Gosu::KB_A
-        @player.set_animation_frame("left")
+        @player.reset_animation("left")
       end
 
       if id == Gosu::KB_S
-        @player.set_animation_frame("down")
+        @player.reset_animation("down")
       end
 
       if id == Gosu::KB_D
-        @player.set_animation_frame("right")
+        @player.reset_animation("right")
       end
     end
+
 
     def button_down(id)
       if (id == Gosu::MsLeft) # If the left mouse button is clicked
@@ -140,6 +146,24 @@ class BucasQuest < Gosu::Window
         puts("right mouse button down")
       end
 
+      # Check if the player should equip an item
+      if (id == Gosu::KB_1 ||id == Gosu::KB_2 || id == Gosu::KB_3 || id == Gosu::KB_4)
+        equip_item(id)
+      end
+
+    end
+
+    def equip_item(id)      
+      case id
+        when Gosu::KB_1
+          @player.get_inventory.set_item_equipped(0)
+        when Gosu::KB_2
+          @player.get_inventory.set_item_equipped(1)
+        when Gosu::KB_3
+          @player.get_inventory.set_item_equipped(2)
+        when Gosu::KB_4
+          @player.get_inventory.set_item_equipped(3)
+        end
 
     end
 
