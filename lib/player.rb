@@ -41,7 +41,7 @@ class Player
       @strike = false
       @striking_current_frame = 0
       @last_time_frame_switch_strike = Process.clock_gettime(Process::CLOCK_MONOTONIC) # Reset the timer used to check the delay between fighting animations
-      @animation_time_strike = 1#0.15
+      @animation_time_strike = 0.5#0.15
 
       # Initalize the player inventory
       @player_inventory = Inventory.new 
@@ -168,7 +168,8 @@ class Player
         if (@current_frame == (@animation_span[-1].to_i + 1)) # Check if the last frame equals the last number in the animation span
           @current_frame = @animation_span[0].to_i # Then reset the animation
         end
-  
+
+        # Apply the animation
         @player = animation_sheet.subimage(@current_frame*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
         
         # Keeping track if the player is in motion or not
@@ -197,14 +198,19 @@ class Player
           # Reset all variables for next time the animation runs
           @player = animation_sheet.subimage(2*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
           @striking_current_frame = 0 
+          @player = animation_sheet.subimage(@striking_current_frame*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
           @strike = false
+          return
         end
+
+        # Det som behövs göras är nu att göra är att fixa paint.net animatiorna
   
+        # Apply the animation
         @player = animation_sheet.subimage(@striking_current_frame*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
           
         # Add to the frame
         @striking_current_frame+=1
-  
+
         # Reset the timer
         @last_time_frame_switch_strike = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       end
@@ -214,43 +220,25 @@ class Player
     # This method displays the equipped item
     def display_equipped_item()
       # Check if the player strikes
-      # IMPORTANT TO NOTE: IF YOU WERE TO UPGRADE THE ANIMATION IN THE FUTURE YOU NEED TO ADD MORE IF STATEMENTS HERE
       if (@strike)
-        if (@striking_current_frame == 0 || @striking_current_frame == 3) # Normal position for hand
-          x = @x+@width/2
+        if (@striking_current_frame == 0 || @striking_current_frame == 3)
           y = @y+@height/2
 
-        elsif (@striking_current_frame == 1) # The overhead strike
-          if (@current_direction == "left")
-            x = @x+@width/2
-          else
-            x = @x+@width
+        elsif (@striking_current_frame == 1)
+          y = @y+@height/8
 
-          end
-          y = @y-@height/2
-
-        elsif (@striking_current_frame == 2) # The middle strike
-          if (@current_direction == "left")
-            x = @x+@width/2-20
-          else
-            x = @x+@width/2
-          end
-          y = @y
-         
+        elsif (@striking_current_frame == 2)
+          y = @y+@height/4          
         end
+        x = @x+@width/2
 
-  
+
+
       else
-          # Set the x and y for the item if the player is not striking. The right and front position have the same. 
-          if (@current_direction == "left")
-            x = @x+@width/2-10
-          else
-            x = @x+@width/2
-          end
-
-          y = @y+@height/2
-
+        x = @x+@width/2
+        y = @y+@height/2
       end
+
       @player_inventory.set_coordinates_item_equipped(x, y)
 
       # Get the item image
