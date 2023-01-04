@@ -36,8 +36,7 @@ class Inventory
         
         # Fill the array (with zeros since its empty)
         for x in 0..3
-            @array_hotbar.push("gold_purse")
-
+            @array_hotbar.push("bread")
         end
         # Items equipped
         @item1_equipped = 0
@@ -48,6 +47,7 @@ class Inventory
         # All the items in the inventory
         # Economy ---
         @gold_purse1 = Gosu::Image.new("./src/ui/items/gold_purse1.png")
+        @bread1 = Gosu::Image.new("./src/ui/items/bread1.png")
         # ---      
 
     end
@@ -135,6 +135,10 @@ class Inventory
         case item
             when "gold_purse"
                 return @gold_purse1
+
+            when "bread"
+                return @bread1
+
             when 0
                 return 0
         end

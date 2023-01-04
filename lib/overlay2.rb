@@ -292,45 +292,6 @@ class Overlay
 
     end
 
-    # This method displays the equipped item
-    def display_equipped_item(player)
-        # Set the new x and y
-        player_x, player_y = player.pos()
-
-        # Check if the player strikes
-        # IMPORTANT TO NOTE: IF YOU WERE TO UPGRADE THE ANIMATION IN THE FUTURE YOU NEED TO ADD MORE IF STATEMENTS HERE
-        player_striking, strike_frame = player.check_if_player_strikes()
-        if (player_striking)
-            if (strike_frame == 0) # Normal position for hand
-                y = player_y+player.get_height/2
-
-            elsif (strike_frame == 1) # The overhead strike
-                y = player_y+player.get_height
-    
-            elsif (strike_frame == 2) # The middle strike
-                y = player_y+player.get_height/4
-
-            end
-            puts(strike_frame.to_s)
-        else
-            # Set the y for the item if the player is not striking
-            y = player_y+player.get_height/2
-        end
-        x = player_x+player.get_width/2
-        player.get_inventory.set_coordinates_item_equipped(x, y)
-  
-        # Get the item image
-        item = player.get_inventory.get_item_equipped
-        item_image = player.get_invegetItemImage(item)
-
-        # Draw it at its location
-        if (item != 0)
-            x,y = player.get_inventory.get_coordinates_item_equipped
-            item_image.draw(x,y)
-        end
-
-    end
-
     def draw(player, mouse_x, mouse_y) # Draw the ui (later implement that th is function takes an argument so it knows which UI to draw but for now its fine)
         @bg.draw(@bg_x, @bg_y)
         @inv_icon.draw(@inv_icon_x, @inv_icon_y)

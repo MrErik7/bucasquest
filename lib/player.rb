@@ -9,7 +9,7 @@ class Player
       @width = @width_front
 
       @x = @y = 0
-      @health = 0
+      @health = 100
       @speed = 2
 
       # Animation ---
@@ -41,7 +41,7 @@ class Player
       @strike = false
       @striking_current_frame = 0
       @last_time_frame_switch_strike = Process.clock_gettime(Process::CLOCK_MONOTONIC) # Reset the timer used to check the delay between fighting animations
-      @animation_time_strike = 0.5#0.15
+      @animation_time_strike = 0.2#0.15
 
       # Initalize the player inventory
       @player_inventory = Inventory.new 
@@ -194,25 +194,26 @@ class Player
     def animation_strike(animation_sheet, offset)
       # Check if its time to switch frame
       if (Process.clock_gettime(Process::CLOCK_MONOTONIC) - @last_time_frame_switch_strike >= @animation_time_strike)
-        if (@striking_current_frame == (@animation_span[-1].to_i + 1)) # Check if the last frame equals the last number in the animation span
-          # Reset all variables for next time the animation runs
-          @player = animation_sheet.subimage(2*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
-          @striking_current_frame = 0 
-          @player = animation_sheet.subimage(@striking_current_frame*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
-          @strike = false
-          return
-        end
-
-        # Det som behövs göras är nu att göra är att fixa paint.net animatiorna
-  
-        # Apply the animation
-        @player = animation_sheet.subimage(@striking_current_frame*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
-          
         # Add to the frame
         @striking_current_frame+=1
 
+        if (@striking_current_frame == 3) # Check if the last frame equals the last number in the animation span
+            @striking_current_frame = 0 
+        end
+
+        # Apply the animation
+        @player = animation_sheet.subimage(@striking_current_frame*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
+
         # Reset the timer
         @last_time_frame_switch_strike = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+        # Check if the loop should be broken
+        if (@striking_current_frame == 0)
+          # Reset all variables for next time the animation runs
+          @player = animation_sheet.subimage(2*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
+          @player = animation_sheet.subimage(@striking_current_frame*offset, 0, @width, @height) # Switch the player frame to the new frame - using the predefined offset multiplied by the current frame
+          @strike = false
+        end
       end
     end
 
@@ -230,12 +231,25 @@ class Player
         elsif (@striking_current_frame == 2)
           y = @y+@height/4          
         end
-        x = @x+@width/2
 
+        # Check the X - if the striking comes from the left the X should be altered
+        if (@current_direction == "left")
+          x = @x
+        elsif (@current_direction == "up")
+          x = @x+@width/1.4
+          y = @y-+2
+        else
+          x = @x+@width/2
 
+        end
 
+      # If the player is not striking - resort to default position
       else
-        x = @x+@width/2
+        if (@current_direction == "left")
+          x = @x
+        else
+          x = @x+@width/2
+        end
         y = @y+@height/2
       end
 
@@ -247,7 +261,15 @@ class Player
 
       # Draw it at its location
       if (item != 0)
-          item_image.draw(x,y)
+        # If the direction is up --> only draw when the frame is 1 (player holds up arm)
+          if (@current_direction == "up")
+            if (@strike && @striking_current_frame == 1)
+              item_image.draw(x,y)
+            end
+          else
+            # Otherwise just draw the thing
+            item_image.draw(x,y)
+          end
       end
 
   end
@@ -271,8 +293,8 @@ class Player
       @player.draw @x, @y, 0
       #@font.draw("x:#{@x}\ny:#{@y}", 100, 200, 0)
 
-      # Check if it exists an item to be equipped and that the player isnt walking up
-      if (@player_inventory.get_item_equipped != 0 && !@player_walking_up)
+      # Check if it exists an item to be equipped 
+      if (@player_inventory.get_item_equipped != 0)
           display_equipped_item()
       end
 
