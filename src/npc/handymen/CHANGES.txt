@@ -1,0 +1,8 @@
+1.1
+- Created sprite simply named "T".
+
+1.0
+- Created blacksmith sprite.
+- Created goldsmith sprite.
+- Created ringsmith sprite.
+- Created woodcutter sprite.
