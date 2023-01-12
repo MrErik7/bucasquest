@@ -10,23 +10,23 @@ class NPC
 
         @type = type # What type of NPC that should spawn
 
-        # Animation ---
+        @width_front = 30
+        @width_side = 26
+        # --- Animation ---
         case @type
 
-        when "old_man"
-            @npc_sheet_idle = Gosu::Image.new("src/npc/1Old_man/Old_man_idle.png")
-            @npc = Gosu::Image.new("src/npc/1Old_man/Old_man_idle.png")
-            @player_sheet_right = Gosu::Image.new("ssrc/npc/1Old_man/Old_man_idle.png")
-            @player_sheet_left = Gosu::Image.new("src/npc/1Old_man/Old_man_idle.png")
-    
-
+        when "blacksmith"
+          @npc_sheet_up = Gosu::Image.new("src/npc/blacksmith/blacksmith_up_walk.png")
+          @npc_sheet_down = Gosu::Image.new("src/player/blacksmith_down_walk.png")
+          @npc_sheet_right = Gosu::Image.new("src/player/blacksmith_right_walk.png")
+          #@npc_sheet_left = Gosu::Image.new("src/player/left_player.png")
+        
         # The more npcs you add --> the more when stuff needs to be added here
         end
 
-  
-        @offset_animation_front= 10+@width_front
-        @offset_animation_side = 10+@width_side
-        
+        @offset_animation_front= 4+@width_front
+        @offset_animation_side = 4+@width_side
+      
         @animation_span = Array(0..2)
         @last_time_frame_switch = Process.clock_gettime(Process::CLOCK_MONOTONIC) # Reset the timer used to check the delay between animations
         @moving = false
